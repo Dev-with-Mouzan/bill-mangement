@@ -6,13 +6,28 @@ const globalForDb = globalThis as typeof globalThis & {
   __arenaNextJsDrizzleDb?: ReturnType<typeof drizzle>;
 };
 
+function cleanConnectionString(rawUrl: string): string {
+  // Remove channel_binding parameter as node-postgres doesn't support SCRAM channel binding
+  return rawUrl
+    .replace(/[?&]channel_binding=[^&]+/g, (match) => (match.startsWith("?") ? "?" : ""))
+    .replace(/\?&/, "?")
+    .replace(/\?$/, "");
+}
+
 function createPool(): Pool {
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
+  const rawUrl =
+    process.env.DATABASE_URL_UNPOOLED ||
+    process.env.POSTGRES_URL_NON_POOLING ||
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL;
+
+  if (!rawUrl) {
     throw new Error(
-      "DATABASE_URL environment variable is missing. Please set DATABASE_URL in your Vercel Environment Variables or .env file."
+      "DATABASE_URL or POSTGRES_URL is missing. Please set DATABASE_URL in your Vercel Environment Variables or .env file."
     );
   }
+
+  const databaseUrl = cleanConnectionString(rawUrl);
 
   const poolConfig: PoolConfig = {
     connectionString: databaseUrl,

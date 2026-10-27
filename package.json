@@ -7,7 +7,8 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "db:push": "drizzle-kit push",
+    "db:init": "node init-db.cjs",
+    "db:push": "drizzle-kit push:pg",
     "db:generate": "drizzle-kit generate",
     "db:studio": "drizzle-kit studio"
   },
