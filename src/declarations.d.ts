@@ -57,6 +57,7 @@ declare module 'lucide-react' {
   export const Menu: LucideIcon;
   export const ScanLine: LucideIcon;
   export const Search: LucideIcon;
+  export const Settings: LucideIcon;
   export const Settings2: LucideIcon;
   export const ShieldCheck: LucideIcon;
   export const TableProperties: LucideIcon;
