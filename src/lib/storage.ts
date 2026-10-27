@@ -9,8 +9,8 @@ import { db } from "@/db";
 import { appState, payments } from "@/db/schema";
 import { isValidDate, validAmount } from "@/lib/bills";
 
-type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
-type PaymentRow = typeof payments.$inferSelect;
+type Transaction = any;
+type PaymentRow = any;
 
 const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 const defaultDirectory = isServerless
@@ -145,7 +145,7 @@ async function initialize(tx: Transaction) {
 
 /** A PostgreSQL advisory transaction lock serializes workbook initialization and mutations across processes. */
 export async function withStore<T>(callback: (tx: Transaction, markChanged: () => void) => Promise<T>): Promise<T> {
-  return db.transaction(async (tx) => {
+  return db.transaction(async (tx: any) => {
     await tx.execute(sql`select pg_advisory_xact_lock(741392018)`);
     await initialize(tx);
     let changed = false;

@@ -1,3 +1,37 @@
+declare module 'drizzle-orm' {
+  export const sql: any;
+  export const eq: any;
+  export const ne: any;
+  export const and: any;
+  export const asc: any;
+  export const desc: any;
+  export type SQL<T = unknown> = any;
+  export type SQLWrapper = any;
+  export type InferSelectModel<T> = any;
+  export type InferInsertModel<T> = any;
+  const all: Record<string, any>;
+  export default all;
+}
+
+declare module 'drizzle-orm/pg-core' {
+  export const pgTable: any;
+  export const text: any;
+  export const numeric: any;
+  export const date: any;
+  export const timestamp: any;
+  export const uniqueIndex: any;
+  export const uuid: any;
+  const all: Record<string, any>;
+  export default all;
+}
+
+declare module 'drizzle-orm/node-postgres' {
+  export const drizzle: any;
+  export type NodePgDatabase<T = any> = any;
+  const all: Record<string, any>;
+  export default all;
+}
+
 declare module 'lucide-react' {
   import * as React from 'react';
   export interface LucideProps extends React.SVGProps<SVGSVGElement> {
@@ -44,4 +78,3 @@ declare module 'lucide-react' {
   const icons: Record<string, LucideIcon>;
   export default icons;
 }
-

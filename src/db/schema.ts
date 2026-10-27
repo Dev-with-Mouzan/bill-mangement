@@ -17,7 +17,7 @@ export const payments = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },
-  (table) => [
+  (table: any) => [
     uniqueIndex("payments_reference_unique").on(table.reference),
     uniqueIndex("payments_request_key_unique").on(table.requestKey),
   ],

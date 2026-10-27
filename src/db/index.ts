@@ -60,7 +60,7 @@ export const pool = new Proxy({} as Pool, {
   },
 });
 
-export const db = new Proxy({} as ReturnType<typeof drizzle>, {
+export const db: any = new Proxy({} as any, {
   get(_target, prop) {
     const active = getDb();
     const value = (active as unknown as Record<string | symbol, unknown>)[prop];
