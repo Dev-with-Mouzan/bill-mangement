@@ -985,24 +985,390 @@ svg { flex-shrink: 0; }
 .empty-state h3 { font-size: 14px; color: var(--deep); margin-bottom: 6px; }
 
 /* ==========================================================================
-   Responsive
+   Responsive Design & Mobile Optimization
    ========================================================================== */
+
+/* Tablets & Small Laptops (<= 900px) */
 @media (max-width: 900px) {
   .navbar-container {
     height: auto;
-    padding: 12px 16px;
+    padding: 10px 18px;
     flex-wrap: wrap;
     gap: 10px;
   }
+
   .navbar-nav {
     order: 3;
     width: 100%;
-    padding-bottom: 4px;
+    padding: 4px 0 6px;
+    gap: 6px;
   }
+
+  .main-content {
+    padding: 24px 18px 36px;
+  }
+
+  .dashboard-lower,
+  .workflow-grid,
+  .batch-top-clean {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .review-card {
+    min-height: auto;
+  }
+}
+
+/* Smartphones (<= 680px) */
+@media (max-width: 680px) {
+  /* Navbar Mobile Layout */
+  .navbar-container {
+    padding: 8px 14px 6px;
+    gap: 8px;
+  }
+
+  .navbar-brand-title {
+    font-size: 18px;
+  }
+
+  .navbar-brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .navbar-nav {
+    order: 3;
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px 0 6px;
+    gap: 6px;
+    scrollbar-width: none;
+  }
+  .navbar-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .navbar-link {
+    flex-shrink: 0;
+    height: 34px;
+    padding: 0 12px;
+    font-size: 12px;
+    border-radius: 18px;
+    background: #f1f5f3;
+  }
+
+  .navbar-link.active {
+    background: var(--green-light);
+    color: #0b6b52;
+  }
+
+  /* Main Container */
+  .main-content {
+    padding: 16px 12px 32px;
+  }
+
+  /* Centered Headings */
+  .page-heading {
+    margin-bottom: 20px;
+    gap: 6px;
+  }
+
+  .page-heading h1 {
+    font-size: 24px;
+  }
+
+  .page-heading p {
+    font-size: 12.5px;
+  }
+
+  .date-chip {
+    height: 30px;
+    font-size: 11px;
+    padding: 0 10px;
+  }
+
+  /* Cards & Stats Grid */
+  .card {
+    border-radius: 8px;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
   }
-  .dashboard-lower, .workflow-grid, .batch-top-clean {
+
+  .stats-grid.two-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+
+  .stat-card {
+    padding: 14px 16px;
+    border-radius: 8px;
+  }
+
+  .stat-top {
+    font-size: 11px;
+  }
+
+  .icon-tile {
+    width: 32px;
+    height: 32px;
+  }
+
+  .stat-card strong {
+    font-size: 20px;
+    margin-top: 6px;
+  }
+
+  /* Overview Lower / Recent Payments */
+  .recent-card, .quick-card {
+    padding: 16px 14px;
+  }
+
+  .recent-table-head {
+    display: none;
+  }
+
+  .recent-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    gap: 10px;
+  }
+
+  .recent-row > span {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .recent-row > strong {
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .recent-row > .row-check {
+    display: none;
+  }
+
+  /* Form Grids: Single column on phones */
+  .form-grid.two {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .form-grid input,
+  .form-grid select,
+  .manual-form input,
+  .edit-form input {
+    height: 42px;
+    font-size: 14px;
+  }
+
+  .amount-input {
+    height: 42px;
+  }
+
+  /* Manual Entry */
+  .manual-card-clean {
+    padding: 18px 14px;
+  }
+
+  .manual-form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .manual-form-actions button {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  /* Scanner & Camera */
+  .capture-card,
+  .review-card {
+    padding: 16px 14px;
+  }
+
+  .camera-surface {
+    height: 190px;
+  }
+
+  .scan-frame {
+    width: 140px;
+    height: 75px;
+  }
+
+  .camera-button {
+    min-height: 42px;
+    font-size: 13px;
+  }
+
+  .barcode-input {
+    height: 42px;
+  }
+
+  .barcode-input input {
+    font-size: 14px;
+  }
+
+  .selected-amount {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    text-align: center;
+    padding: 14px;
+  }
+
+  .selected-amount button {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  /* Batch Scanning */
+  .batch-actions {
+    width: 100%;
+  }
+
+  .batch-actions button {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+  }
+
+  .batch-queue {
+    padding: 16px 14px;
+  }
+
+  .card-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .queue-total {
+    text-align: left;
+  }
+
+  .queue-total strong {
+    font-size: 16px;
+  }
+
+  /* Records Filter & Table */
+  .records-card {
+    padding: 16px 12px;
+  }
+
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .filter-search {
+    width: 100%;
+    height: 40px;
+  }
+
+  .filter-search input {
+    font-size: 13px;
+  }
+
+  .filter-dates {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .filter-date {
+    width: 100%;
+    height: 40px;
+    justify-content: space-between;
+  }
+
+  .filter-date input {
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .filter-export-btn {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+    font-size: 13px;
+  }
+
+  .clear-filter {
+    align-self: flex-end;
+    padding: 2px 4px;
+  }
+
+  .table-scroll {
+    border-radius: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .records-table,
+  .batch-table {
+    min-width: 600px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 10px 10px;
+    font-size: 12px;
+  }
+
+  /* Modals */
+  .modal-backdrop {
+    padding: 14px;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px 16px;
+    border-radius: 10px;
+  }
+
+  .modal-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .modal-actions button {
+    width: 100%;
+    min-height: 42px;
+    justify-content: center;
+  }
+
+  /* Toast Notification */
+  .toast {
+    left: 12px;
+    right: 12px;
+    bottom: 14px;
+    max-width: none;
+    font-size: 12px;
+    padding: 12px 14px;
+  }
+}
+
+/* Extra Small Phones (<= 375px) */
+@media (max-width: 375px) {
+  .stats-grid.two-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-dates {
     grid-template-columns: 1fr;
   }
 }

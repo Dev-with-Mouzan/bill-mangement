@@ -243,22 +243,23 @@ export function RecordsView({
               aria-label="Search reference number"
             />
           </label>
-          <label className="filter-date">
-            <span>From</span>
-            <input type="date" value={from} onChange={event => setFrom(event.target.value)} aria-label="From date" />
-          </label>
-          <label className="filter-date">
-            <span>To</span>
-            <input type="date" value={to} onChange={event => setTo(event.target.value)} aria-label="To date" />
-          </label>
+          <div className="filter-dates">
+            <label className="filter-date">
+              <span>From</span>
+              <input type="date" value={from} onChange={event => setFrom(event.target.value)} aria-label="From date" />
+            </label>
+            <label className="filter-date">
+              <span>To</span>
+              <input type="date" value={to} onChange={event => setTo(event.target.value)} aria-label="To date" />
+            </label>
+          </div>
           {hasFilters && (
             <button className="clear-filter" onClick={() => { setSearch(""); setFrom(""); setTo(""); }}>
-              Clear Filters
+              Clear
             </button>
           )}
           <button
-            className="button button-primary"
-            style={{ marginLeft: "auto" }}
+            className="button button-primary filter-export-btn"
             onClick={() => onExport({ search, from, to })}
             disabled={exporting || invalidRange}
           >
