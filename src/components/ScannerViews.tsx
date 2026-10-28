@@ -18,6 +18,23 @@ type CommonProps = {
 
 const EXAMPLE = "202610-0012345678901-000000005000-20261020-000000005250";
 
+function beep() {
+  try {
+    const AudioCtor: typeof AudioContext | undefined = window.AudioContext ?? (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioCtor) return;
+    const ctx = new AudioCtor();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.setValueAtTime(900, ctx.currentTime);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.12);
+  } catch { /* silence if audio is blocked */ }
+}
+
 function ScannerCapture({ onRead, batch = false }: { onRead: (raw: string) => void; batch?: boolean }) {
   const reactId = useId();
   const readerId = `reader-${reactId.replace(/[^a-zA-Z0-9]/g, "")}`;
@@ -62,6 +79,7 @@ function ScannerCapture({ onRead, batch = false }: { onRead: (raw: string) => vo
           const now = Date.now();
           if (lastScan.current.value === decodedText && now - lastScan.current.time < 4000) return;
           lastScan.current = { value: decodedText, time: now };
+          beep();
           readRef.current(decodedText);
           if (!batch) void stop();
         },
@@ -79,6 +97,7 @@ function ScannerCapture({ onRead, batch = false }: { onRead: (raw: string) => vo
   const submit = () => {
     if (!input.trim()) return;
     setError("");
+    beep();
     readRef.current(input.trim());
     setInput("");
   };
@@ -181,6 +200,13 @@ export function ParserSettings({ config, setConfig, expanded = false }: { config
               <option value="decimal">Decimal</option>
             </select>
           </label>
+          <label>
+            <span>Month Format</span>
+            <select value={config.monthFormat} onChange={event => setConfig(prev => ({ ...prev, monthFormat: event.target.value as ParserConfig["monthFormat"] }))}>
+              <option value="YYYYMM">YYYYMM (e.g. 202608)</option>
+              <option value="MMM YY">MMM YY (e.g. AUG 26)</option>
+            </select>
+          </label>
           {positionFields.map(([key, label]) => (
             <label key={key}>
               <span>{label} Index</span>
@@ -275,11 +301,54 @@ function BillEditor({ bill, update, duplicate, saving, onSubmit, submitLabel = "
   );
 }
 
+function ScanResultPopup({ bill, onClose }: { bill: BillDraft; onClose: () => void }) {
+  return (
+    <div className="modal-backdrop" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
+      <div className="modal modal-wide" role="dialog" aria-modal="true" aria-label="Scan result">
+        <div className="modal-icon"><Barcode size={24} /></div>
+        <h2>Scan Complete</h2>
+        <div className="form-grid two" style={{ marginTop: "12px" }}>
+          <label>
+            <span>Reference</span>
+            <span style={{ fontWeight: 700, color: "var(--deep)" }}>{bill.reference || "—"}</span>
+          </label>
+          <label>
+            <span>Billing Month</span>
+            <span style={{ fontWeight: 700, color: "var(--deep)" }}>{bill.billingMonth || "—"}</span>
+          </label>
+          <label>
+            <span>Original Amount</span>
+            <span style={{ fontWeight: 700, color: "var(--deep)" }}>{bill.originalAmount ? `PKR ${formatMoney(bill.originalAmount)}` : "—"}</span>
+          </label>
+          <label>
+            <span>Due Date</span>
+            <span style={{ fontWeight: 700, color: "var(--deep)" }}>{formatDate(bill.dueDate)}</span>
+          </label>
+        </div>
+        <div className="modal-actions">
+          <button className="button button-outline" onClick={onClose}>Dismiss</button>
+          <button className="button button-primary" onClick={onClose}>
+            <CheckCircle2 size={17} /> Apply
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function SingleScan({ records, config, setConfig, onSave, onMessage, saving, askConfirm, bill, setBill }: CommonProps & { bill: BillDraft | null; setBill: Dispatch<SetStateAction<BillDraft | null>> }) {
+  const [scanResult, setScanResult] = useState<BillDraft | null>(null);
+
   const read = (raw: string) => {
-    const replace = () => setBill(parseBarcode(raw, config));
-    if (bill) askConfirm({ title: "Replace scan?", description: "Replace current unsaved bill with new scan?", confirmLabel: "Replace", onConfirm: replace });
-    else replace();
+    setScanResult(parseBarcode(raw, config));
+  };
+
+  const applyScan = () => {
+    if (!scanResult) return;
+    const apply = () => { setBill(scanResult); setScanResult(null); };
+    if (bill) askConfirm({ title: "Replace scan?", description: "Replace current unsaved bill with new scan?", confirmLabel: "Replace", onConfirm: apply });
+    else apply();
+    setScanResult(null);
   };
 
   const save = async () => {
@@ -318,6 +387,9 @@ export function SingleScan({ records, config, setConfig, onSave, onMessage, savi
           )}
         </section>
       </div>
+      {scanResult && (
+        <ScanResultPopup bill={scanResult} onClose={applyScan} />
+      )}
     </div>
   );
 }

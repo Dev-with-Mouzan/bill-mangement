@@ -59,8 +59,9 @@ export default function BillFlowApp() {
           if (Number.isInteger(savedConfig[key]) && savedConfig[key] >= 1 && savedConfig[key] <= 30) base[key] = savedConfig[key];
         }
         if (["YYYYMMDD", "DDMMYYYY", "YYYY-MM-DD", "DD/MM/YYYY"].includes(savedConfig.dateFormat)) base.dateFormat = savedConfig.dateFormat;
-        if (["rupees", "paisa", "decimal"].includes(savedConfig.amountEncoding)) base.amountEncoding = savedConfig.amountEncoding;
-        setConfig(base);
+  if (["rupees", "paisa", "decimal"].includes(savedConfig.amountEncoding)) base.amountEncoding = savedConfig.amountEncoding;
+  if (["YYYYMM", "MMM YY"].includes(savedConfig.monthFormat)) base.monthFormat = savedConfig.monthFormat;
+  setConfig(base);
       }
     } catch { /* Ignore storage errors */ }
 

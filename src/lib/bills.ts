@@ -23,6 +23,12 @@ export type ParserConfig = {
   latePosition: number;
   dateFormat: "YYYYMMDD" | "DDMMYYYY" | "YYYY-MM-DD" | "DD/MM/YYYY";
   amountEncoding: "rupees" | "paisa" | "decimal";
+  monthFormat: "YYYYMM" | "MMM YY";
+};
+
+const MONTH_ABBREVIATIONS: Record<string, number> = {
+  JAN: 1, FEB: 2, MAR: 3, APR: 4, MAY: 5, JUN: 6,
+  JUL: 7, AUG: 8, SEP: 9, OCT: 10, NOV: 11, DEC: 12
 };
 
 export const DEFAULT_PARSER_CONFIG: ParserConfig = {
@@ -34,6 +40,7 @@ export const DEFAULT_PARSER_CONFIG: ParserConfig = {
   latePosition: 5,
   dateFormat: "YYYYMMDD",
   amountEncoding: "rupees",
+  monthFormat: "YYYYMM",
 };
 
 export type BillDraft = {
@@ -66,8 +73,10 @@ export function isValidDate(value: string): boolean {
 }
 
 export function isValidMonth(value: string): boolean {
-  const match = /^(\d{4})-(\d{2})$/.exec(value);
-  return !!match && Number(match[1]) >= 1900 && Number(match[2]) >= 1 && Number(match[2]) <= 12;
+  const yyyymm = /^(\d{4})-(\d{2})$/.exec(value);
+  if (yyyymm) return Number(yyyymm[1]) >= 1900 && Number(yyyymm[2]) >= 1 && Number(yyyymm[2]) <= 12;
+  const mmmyy = /^([A-Za-z]{3})\s+(\d{2})$/.exec(value.trim());
+  return !!mmmyy && !!MONTH_ABBREVIATIONS[mmmyy[1].toUpperCase()];
 }
 
 export function validAmount(value: string | number): boolean {
@@ -109,7 +118,17 @@ export function parseBarcode(raw: string, config: ParserConfig = DEFAULT_PARSER_
   const parts = config.separator ? text.split(config.separator) : [];
   const field = (position: number) => parts[position - 1]?.trim() ?? "";
   const monthRaw = field(config.monthPosition);
-  const month = /^\d{6}$/.test(monthRaw) ? `${monthRaw.slice(0, 4)}-${monthRaw.slice(4, 6)}` : "";
+  let month = "";
+  if (config.monthFormat === "MMM YY") {
+    const match = /^([A-Za-z]{3})\s+(\d{2})$/.exec(monthRaw.trim());
+    if (match) {
+      const monthNum = MONTH_ABBREVIATIONS[match[1].toUpperCase()];
+      const year = 2000 + Number(match[2]);
+      month = `${year}-${String(monthNum).padStart(2, "0")}`;
+    }
+  } else {
+    month = /^\d{6}$/.test(monthRaw) ? `${monthRaw.slice(0, 4)}-${monthRaw.slice(4, 6)}` : "";
+  }
   const bill: BillDraft = {
     clientId: newClientId(),
     rawBarcode: text,
@@ -123,7 +142,7 @@ export function parseBarcode(raw: string, config: ParserConfig = DEFAULT_PARSER_
   };
   if (!text) bill.parseErrors.push("Barcode is empty.");
   if (!config.separator || parts.length < Math.max(config.monthPosition, config.referencePosition, config.amountPosition, config.duePosition, config.latePosition)) bill.parseErrors.push("Barcode is incomplete for the configured field positions.");
-  if (!bill.billingMonth) bill.parseErrors.push("Billing month must be in YYYYMM format.");
+  if (!bill.billingMonth) bill.parseErrors.push(`Billing month must be in ${config.monthFormat} format.`);
   if (!bill.reference) bill.parseErrors.push("Reference number is missing.");
   if (!bill.originalAmount) bill.parseErrors.push("Original amount is missing or invalid.");
   if (!bill.dueDate) bill.parseErrors.push("Due date is missing or invalid for the selected format.");
